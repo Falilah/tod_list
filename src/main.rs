@@ -1,7 +1,7 @@
 use clap::parser;
-use serde::{Deserialize, Serialize};
+use serde::{ser::SerializeStruct, Deserialize, Serialize};
 use std::fs::File;
-use serde_json;
+// use serde_json;
 #[derive(Serialize, Deserialize, Debug)]
 struct Task {
     description: String,
