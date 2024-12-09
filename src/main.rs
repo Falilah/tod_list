@@ -35,8 +35,7 @@ fn main() {
 }
 
 fn save_tasks(tasks: &Vec<Task>) -> io::Result<()> {
-    // Attempt to open the file for reading and writing, or create it if it does not exist
-    let file_path = "tasks.json";
+    let file_path = "./tasks.json";
     let mut file = OpenOptions::new()
         .read(true)
         .write(true)
