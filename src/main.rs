@@ -35,7 +35,8 @@ fn main() {
 }
 
 fn save_tasks(tasks: &Vec<Task>) -> io::Result<()> {
-    let file_path = "./tasks.json";
+    // Attempt to open the file for reading and writing, or create it if it does not exist
+    let file_path = "tasks.json";
     let mut file = OpenOptions::new()
         .read(true)
         .write(true)
@@ -58,10 +59,24 @@ fn save_tasks(tasks: &Vec<Task>) -> io::Result<()> {
 
     // Serialize the combined tasks to JSON
     let json = serde_json::to_string(&existing_tasks)?;
+    // writeln!(file)?;
 
     // Truncate the file and write the updated JSON
     file.set_len(0)?; // Clear the file content
     write!(file, "{}", json)?;
+    
+    let file_path = "tasks.json";
+    let mut file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(true)
+        .open(file_path)?;
+
+    // Read the existing contents, if any
+    let mut existing_data = String::new();
+    file.read_to_string(&mut existing_data)?;
+
+    let _ = existing_data.trim();
 
     Ok(())
 }
