@@ -2,7 +2,7 @@ use clap::parser;
 use serde::{Serialize, Deserialize};
 use serde_json;
 use std::fs::{OpenOptions, File};
-use std::io::{self, Write, Read};
+use std::io::{self, Write, Read, BufReader, Seek};
 // use serde_json;
 #[derive(Serialize, Deserialize, Debug, Clone)]
 struct Task {
@@ -43,6 +43,8 @@ fn save_tasks(tasks: &Vec<Task>) -> io::Result<()> {
         .create(true)
         .open(file_path)?;
 
+        // let mut reader = BufReader::new(file);
+
     // Read the existing contents, if any
     let mut existing_data = String::new();
     file.read_to_string(&mut existing_data)?;
@@ -57,26 +59,16 @@ fn save_tasks(tasks: &Vec<Task>) -> io::Result<()> {
     // Append the new tasks to the existing tasks
     existing_tasks.extend_from_slice(tasks);
 
+    //  
+
     // Serialize the combined tasks to JSON
     let json = serde_json::to_string(&existing_tasks)?;
     // writeln!(file)?;
 
     // Truncate the file and write the updated JSON
     file.set_len(0)?; // Clear the file content
+    file.seek(io::SeekFrom::End(0))?;
     write!(file, "{}", json)?;
-    
-    let file_path = "tasks.json";
-    let mut file = OpenOptions::new()
-        .read(true)
-        .write(true)
-        .create(true)
-        .open(file_path)?;
-
-    // Read the existing contents, if any
-    let mut existing_data = String::new();
-    file.read_to_string(&mut existing_data)?;
-
-    let _ = existing_data.trim();
 
     Ok(())
 }
