@@ -1,15 +1,30 @@
 use serde::{Serialize, Deserialize};
 use serde_json;
-use std::fs::{OpenOptions};
+use std::fs::{OpenOptions, File};
 use std::io::{self, Write, Read, Seek};
-use clap::{parser, Subcommand};
+use clap::{Parser, Subcommand};
 
+
+#[derive(Parser)]
+#[command(name = "Todo List", version = "1.0", about = "A simple CLI To-Do list")]
+struct Cli {
+    #[command(subcommand)]
+    command: Commands,
+}
+
+#[derive(Subcommand)]
+enum Commands {
+    /// Add a new task
+    Add { description: String },
+    /// List all tasks
+    List,
+    /// Mark a task as done
+    Done { index: usize },
+}
 #[derive(Serialize, Deserialize, Debug, Clone)]
 struct Task {
-    /// task string
     description: String,
 
-    /// task indication
     done: bool,
 }
 
@@ -20,21 +35,73 @@ impl Task{
 }
 
 
-fn main() {
+// fn main() {
 
-    let task1 = Task::new("Lay Bed".to_string());
-    let task2 = Task::new("Brush teeth".to_string());
-    let task3 = Task::new("Audit".to_string());
-    let task4 = Task::new("gym".to_string());
-    let task5 = Task::new("Audit".to_string());
+//     let task1 = Task::new("Lay Bed".to_string());
+//     let task2 = Task::new("Brush teeth".to_string());
+//     let task3 = Task::new("Audit".to_string());
+//     let task4 = Task::new("gym".to_string());
+//     let task5 = Task::new("Audit".to_string());
 
-    let tasks = vec![task1, task2, task3, task4, task5];
+//     let tasks = vec![task1, task2, task3, task4, task5];
 
-    let r = save_tasks(&tasks);
+//     let r = save_tasks(&tasks);
 
 
     
 
+// }
+
+fn main()  {
+    let cli = Cli::parse();
+    let file_path = "tasks.json";
+
+    match cli.command {
+        Commands::Add { description } => {
+            let mut tasks = Vec::new();
+            tasks.push(Task {
+                description,
+                done: false,
+            });
+            save_tasks(&tasks);
+            println!("Task added!");
+        }
+        Commands::List => {
+            let tasks: Result<Vec<Task>, io::Error> = load_tasks(file_path);
+            for (i, task) in tasks.iter().enumerate() {
+                println!(
+                    "{}. [{}] {}",
+                    i + 1,
+                    if task.done { "x" } else { " " },
+                    task.description
+                );
+            }
+        }
+        Commands::Done { index } => {
+            let mut tasks = load_tasks(file_path)?;
+            if index == 0 || index > tasks.len() {
+                println!("Invalid task index.");
+            } else {
+                tasks[index - 1].done = true;
+                save_tasks(file_path, &tasks)?;
+                println!("Task marked as done!");
+            }
+        }
+    }
+
+    Ok(())
+}
+
+
+fn load_tasks(file_path: &str) -> std::io::Result<Vec<Task>> {
+    let mut file = match File::open(file_path) {
+        Ok(file) => file,
+        Err(_) => return Ok(Vec::new()), // If file does not exist, return an empty task list
+    };
+    let mut contents = String::new();
+    file.read_to_string(&mut contents)?;
+    let tasks: Vec<Task> = serde_json::from_str(&contents).unwrap_or_else(|_| Vec::new());
+    Ok(tasks)
 }
 
 fn save_tasks(tasks: &Vec<Task>) -> io::Result<()> {
