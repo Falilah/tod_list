@@ -35,24 +35,9 @@ impl Task{
 }
 
 
-// fn main() {
-
-//     let task1 = Task::new("Lay Bed".to_string());
-//     let task2 = Task::new("Brush teeth".to_string());
-//     let task3 = Task::new("Audit".to_string());
-//     let task4 = Task::new("gym".to_string());
-//     let task5 = Task::new("Audit".to_string());
-
-//     let tasks = vec![task1, task2, task3, task4, task5];
-
-//     let r = save_tasks(&tasks);
 
 
-    
-
-// }
-
-fn main()  {
+fn main()   -> Result<(), io::Error>{
     let cli = Cli::parse();
     let file_path = "tasks.json";
 
@@ -69,12 +54,12 @@ fn main()  {
         Commands::List => {
             let tasks: Result<Vec<Task>, io::Error> = load_tasks(file_path);
             for (i, task) in tasks.iter().enumerate() {
-                println!(
-                    "{}. [{}] {}",
-                    i + 1,
-                    if task.done { "x" } else { " " },
-                    task.description
-                );
+                // println!(
+                //     "{}. [{}] {}",
+                //     i + 1,
+                //     if task.done { "x" } else { " " },
+                //     task.description
+                // );
             }
         }
         Commands::Done { index } => {
@@ -83,7 +68,7 @@ fn main()  {
                 println!("Invalid task index.");
             } else {
                 tasks[index - 1].done = true;
-                save_tasks(file_path, &tasks)?;
+                save_tasks(&tasks)?;
                 println!("Task marked as done!");
             }
         }
