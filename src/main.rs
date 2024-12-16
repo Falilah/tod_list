@@ -1,9 +1,8 @@
-use serde::{Serialize, Deserialize};
-use serde_json;
-use std::fs::{OpenOptions, File};
-use std::io::{self, Write, Read, Seek};
 use clap::{Parser, Subcommand};
-
+use serde::{Deserialize, Serialize};
+use serde_json;
+use std::fs::{File, OpenOptions};
+use std::io::{self, Read, Seek, Write};
 
 #[derive(Parser)]
 #[command(name = "Todo List", version = "1.0", about = "A simple CLI To-Do list")]
@@ -28,16 +27,16 @@ struct Task {
     done: bool,
 }
 
-impl Task{
-    fn new(des: String) -> Task{
-        Task { description: des, done: false }
+impl Task {
+    fn new(des: String) -> Task {
+        Task {
+            description: des,
+            done: false,
+        }
     }
 }
 
-
-
-
-fn main()   -> Result<(), io::Error>{
+fn main() -> Result<(), io::Error> {
     let cli = Cli::parse();
     let file_path = "tasks.json";
 
@@ -76,7 +75,6 @@ fn main()   -> Result<(), io::Error>{
 
     Ok(())
 }
-
 
 fn load_tasks(file_path: &str) -> std::io::Result<Vec<Task>> {
     let mut file = match File::open(file_path) {
