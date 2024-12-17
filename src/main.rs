@@ -53,12 +53,7 @@ fn main() -> Result<(), io::Error> {
         Commands::List => {
             let tasks: Result<Vec<Task>, io::Error> = load_tasks(file_path);
             for (i, task) in tasks.iter().enumerate() {
-                // println!(
-                //     "{}. [{}] {}",
-                //     i + 1,
-                //     if task.done { "x" } else { " " },
-                //     task.description
-                // );
+               
             }
         }
         Commands::Done { index } => {
