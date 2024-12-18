@@ -104,7 +104,6 @@ fn save_tasks(tasks: &Vec<Task>) -> io::Result<()> {
 
     // Serialize the combined tasks to JSON
     let json = serde_json::to_string(&existing_tasks)?;
-    // writeln!(file)?;
 
     file.set_len(0)?; // Clear the file content
     file.seek(io::SeekFrom::End(0))?;
