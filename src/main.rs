@@ -71,16 +71,16 @@ fn main() -> Result<(), io::Error> {
     Ok(())
 }
 
-fn load_tasks(file_path: &str) -> std::io::Result<Vec<Task>> {
-    let mut file = match File::open(file_path) {
-        Ok(file) => file,
-        Err(_) => return Ok(Vec::new()), // If file does not exist, return an empty task list
-    };
-    let mut contents = String::new();
-    file.read_to_string(&mut contents)?;
-    let tasks: Vec<Task> = serde_json::from_str(&contents).unwrap_or_else(|_| Vec::new());
-    Ok(tasks)
-}
+// fn load_tasks(file_path: &str) -> std::io::Result<Vec<Task>> {
+//     let mut file = match File::open(file_path) {
+//         Ok(file) => file,
+//         Err(_) => return Ok(Vec::new()), // If file does not exist, return an empty task list
+//     };
+//     let mut contents = String::new();
+//     file.read_to_string(&mut contents)?;
+//     let tasks: Vec<Task> = serde_json::from_str(&contents).unwrap_or_else(|_| Vec::new());
+//     Ok(tasks)
+// }
 
 fn save_tasks(tasks: &Vec<Task>) -> io::Result<()> {
     let file_path = "tasks.json";
