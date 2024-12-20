@@ -71,16 +71,24 @@ fn main() -> Result<(), io::Error> {
     Ok(())
 }
 
-// fn load_tasks(file_path: &str) -> std::io::Result<Vec<Task>> {
-//     let mut file = match File::open(file_path) {
-//         Ok(file) => file,
-//         Err(_) => return Ok(Vec::new()), // If file does not exist, return an empty task list
-//     };
-//     let mut contents = String::new();
-//     file.read_to_string(&mut contents)?;
-//     let tasks: Vec<Task> = serde_json::from_str(&contents).unwrap_or_else(|_| Vec::new());
-//     Ok(tasks)
-// }
+fn load_tasks(file_path: &str) -> std::io::Result<Vec<Task>> {
+    let file_path = "tasks.json";
+    let mut file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(true)
+        .open(file_path)?;
+    let mut existing_data = String::new();
+    file.read_to_string(&mut existing_data)?;
+
+    // Deserialize the existing JSON into a vector of tasks
+    let mut existing_tasks: Vec<Task> = if !existing_data.trim().is_empty() {
+        serde_json::from_str(&existing_data).unwrap_or_else(|_| Vec::new())
+    } else {
+        Vec::new()
+    };
+    Ok(existing_tasks)
+}
 
 fn save_tasks(tasks: &Vec<Task>) -> io::Result<()> {
     let file_path = "tasks.json";
