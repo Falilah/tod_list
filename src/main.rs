@@ -51,13 +51,13 @@ fn main() -> Result<(), io::Error> {
             println!("Task added!");
         }
         Commands::List => {
-            let tasks: Result<Vec<Task>, io::Error> = load_tasks(file_path);
+            let (tasks, _)= load_tasks().unwrap();
             for (i, task) in tasks.iter().enumerate() {
                
             }
         }
         Commands::Done { index } => {
-            let mut tasks = load_tasks(file_path)?;
+            let (mut tasks, _) = load_tasks()?;
             if index == 0 || index > tasks.len() {
                 println!("Invalid task index.");
             } else {
@@ -71,7 +71,7 @@ fn main() -> Result<(), io::Error> {
     Ok(())
 }
 
-fn load_tasks(file_path: &str) -> std::io::Result<Vec<Task>> {
+fn load_tasks() -> std::io::Result<(Vec<Task>, File)> {
     let file_path = "tasks.json";
     let mut file = OpenOptions::new()
         .read(true)
@@ -82,30 +82,19 @@ fn load_tasks(file_path: &str) -> std::io::Result<Vec<Task>> {
     file.read_to_string(&mut existing_data)?;
 
     // Deserialize the existing JSON into a vector of tasks
-    let mut existing_tasks: Vec<Task> = if !existing_data.trim().is_empty() {
+    let existing_tasks: Vec<Task> = if !existing_data.trim().is_empty() {
         serde_json::from_str(&existing_data).unwrap_or_else(|_| Vec::new())
     } else {
         Vec::new()
     };
-    Ok(existing_tasks)
+    let output = (existing_tasks, file);
+    Ok(output)
 }
 
-fn save_tasks(tasks: &Vec<Task>) -> io::Result<()> {
-    let file_path = "tasks.json";
-    let mut file = OpenOptions::new()
-        .read(true)
-        .write(true)
-        .create(true)
-        .open(file_path)?;
-    let mut existing_data = String::new();
-    file.read_to_string(&mut existing_data)?;
+fn save_tasks(tasks: &Vec<Task>) -> io::Result<()> {   
 
     // Deserialize the existing JSON into a vector of tasks
-    let mut existing_tasks: Vec<Task> = if !existing_data.trim().is_empty() {
-        serde_json::from_str(&existing_data).unwrap_or_else(|_| Vec::new())
-    } else {
-        Vec::new()
-    };
+    let (mut existing_tasks, mut file) = load_tasks().unwrap();
 
     // Append the new tasks to the existing tasks
     existing_tasks.extend_from_slice(tasks);
