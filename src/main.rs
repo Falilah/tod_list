@@ -27,18 +27,17 @@ struct Task {
     done: bool,
 }
 
-impl Task {
-    fn new(des: String) -> Task {
-        Task {
-            description: des,
-            done: false,
-        }
-    }
-}
+// impl Task {
+//     fn new(des: String) -> Task {
+//         Task {
+//             description: des,
+//             done: false,
+//         }
+//     }
+// }
 
 fn main() -> Result<(), io::Error> {
     let cli = Cli::parse();
-    let file_path = "tasks.json";
 
     match cli.command {
         Commands::Add { description } => {
@@ -47,20 +46,22 @@ fn main() -> Result<(), io::Error> {
                 description,
                 done: false,
             });
-            save_tasks(&tasks);
-            println!("Task added!");
+            let list_items = save_tasks(&tasks);
+            println!("Task added!:{:?}", list_items);
         }
         Commands::List => {
             let (tasks, _)= load_tasks().unwrap();
             for (i, task) in tasks.iter().enumerate() {
+                println!("{}: {:?}", i + 1, task);
                
             }
         }
         Commands::Done { index } => {
-            let (mut tasks, _) = load_tasks()?;
+            let (mut tasks,  file) = load_tasks()?;
             if index == 0 || index > tasks.len() {
                 println!("Invalid task index.");
             } else {
+                file.set_len(0)?; 
                 tasks[index - 1].done = true;
                 save_tasks(&tasks)?;
                 println!("Task marked as done!");
