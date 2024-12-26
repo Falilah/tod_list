@@ -5,7 +5,7 @@ use std::fs::{File, OpenOptions};
 use std::io::{self, Read, Seek, Write};
 
 #[derive(Parser)]
-#[command(name = "Todo List", version = "1.0", about = "A simple CLI To-Do list")]
+// #[command(name = "Todo List", version = "1.0", about = "A simple CLI To-Do list")]
 struct Cli {
     #[command(subcommand)]
     command: Commands,
@@ -27,18 +27,11 @@ struct Task {
     done: bool,
 }
 
-// impl Task {
-//     fn new(des: String) -> Task {
-//         Task {
-//             description: des,
-//             done: false,
-//         }
-//     }
-// }
-
-fn main() -> Result<(), io::Error> {
+fn main() {
     let cli = Cli::parse();
-
+    let _ = process_action(cli);
+}
+fn process_action(cli: Cli) -> Result<(), io::Error> {
     match cli.command {
         Commands::Add { description } => {
             let mut tasks = Vec::new();
@@ -50,18 +43,17 @@ fn main() -> Result<(), io::Error> {
             println!("Task added!:{:?}", list_items);
         }
         Commands::List => {
-            let (tasks, _)= load_tasks().unwrap();
+            let (tasks, _) = load_tasks().unwrap();
             for (i, task) in tasks.iter().enumerate() {
                 println!("{}: {:?}", i + 1, task);
-               
             }
         }
         Commands::Done { index } => {
-            let (mut tasks,  file) = load_tasks()?;
+            let (mut tasks, file) = load_tasks()?;
             if index == 0 || index > tasks.len() {
                 println!("Invalid task index.");
             } else {
-                file.set_len(0)?; 
+                file.set_len(0)?;
                 tasks[index - 1].done = true;
                 save_tasks(&tasks)?;
                 println!("Task marked as done!");
@@ -92,8 +84,7 @@ fn load_tasks() -> std::io::Result<(Vec<Task>, File)> {
     Ok(output)
 }
 
-fn save_tasks(tasks: &Vec<Task>) -> io::Result<()> {   
-
+fn save_tasks(tasks: &Vec<Task>) -> io::Result<()> {
     // Deserialize the existing JSON into a vector of tasks
     let (mut existing_tasks, mut file) = load_tasks().unwrap();
 
