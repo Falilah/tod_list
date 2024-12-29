@@ -1,6 +1,1 @@
-[
-  { "description": "wash_clothes", "done": true },
-  { "description": "code_cairo", "done": false },
-  { "description": "code_rust", "done": true },
-  { "description": "do_dishes", "done": false }
-]
+[{"description":"Test task","done":false}]

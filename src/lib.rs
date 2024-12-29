@@ -96,9 +96,38 @@ fn save_tasks(tasks: &Vec<Task>) -> io::Result<()> {
     Ok(())
 }
 
-#[cfg(test)] mod test{
+#[cfg(test)] 
+mod tests{
+    use super::*;
+    use std::fs;
+    use tempfile::tempdir;
+
+     // Helper function to reset the tasks.json file for tests
+     fn setup_temp_file() -> String {
+        let dir = tempdir().unwrap();
+        let file_path = dir.path().join("tasks.json");
+        file_path.to_str().unwrap().to_string()
+    }
+
+    fn set_up_file_environment(file_path: &str) {
+        let _ = fs::File::create(file_path);
+    }
     #[test]
-    fn test_process_action() {
-        
+    fn test_add_task() {
+        let temp_file = setup_temp_file();
+        set_up_file_environment(&temp_file);
+
+        let cli = Cli {
+            command: Commands::Add {
+                description: "Test task".to_string(),
+            },
+        };
+
+        process_action(cli).unwrap();
+
+        let (tasks, _) = load_tasks().unwrap();
+        assert_eq!(tasks.len(), 1);
+        assert_eq!(tasks[0].description, "Test task");
+        assert!(!tasks[0].done);
     }
 }
