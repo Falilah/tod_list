@@ -130,4 +130,26 @@ mod tests{
         assert_eq!(tasks[0].description, "Test task");
         assert!(!tasks[0].done);
     }
+
+    #[test]
+    fn test_mark_task_done() {
+        let temp_file = setup_temp_file();
+        set_up_file_environment(&temp_file);
+
+        let tasks = vec![Task {
+            description: "Task to complete".to_string(),
+            done: false,
+        }];
+        save_tasks(&tasks).unwrap();
+
+        let cli = Cli {
+            command: Commands::Done { index: 1 },
+        };
+
+        process_action(cli).unwrap();
+
+        let (updated_tasks, _) = load_tasks().unwrap();
+        assert_eq!(updated_tasks.len(), 1);
+        assert!(updated_tasks[0].done);
+    }
 }
