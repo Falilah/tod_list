@@ -152,4 +152,25 @@ mod tests{
         assert_eq!(updated_tasks.len(), 1);
         assert!(updated_tasks[0].done);
     }
+
+    #[test]
+    fn test_invalid_task_index_for_done() {
+        let temp_file = setup_temp_file();
+        set_up_file_environment(&temp_file);
+
+        let tasks = vec![Task {
+            description: "Another task".to_string(),
+            done: false,
+        }];
+        save_tasks(&tasks).unwrap();
+
+        let cli = Cli {
+            command: Commands::Done { index: 2 },
+        };
+
+        process_action(cli).unwrap_err();
+        let (unchanged_tasks, _) = load_tasks().unwrap();
+        assert_eq!(unchanged_tasks.len(), 1);
+        assert!(!unchanged_tasks[0].done);
+    }
 }
